@@ -15,7 +15,7 @@ public class arcadeDrive extends LinearOpMode {
     private DcMotor leftDrive;
     private DcMotor rightDrive;
     private DcMotor armMotor;
-    
+
     @Override
     public void runOpMode()
     {
