@@ -16,7 +16,7 @@ public class arcadeDrive extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor armMotor;
 
-    //this comment was made on Luke's computer
+    //this comment was made on Luke's Computer
 
     @Override
     public void runOpMode()
