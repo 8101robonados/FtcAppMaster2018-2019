@@ -51,7 +51,7 @@ public class arcadeDrive extends LinearOpMode {
         liftMotor.setDirection(DcMotor.Direction.FORWARD);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 //END INITIALIZING HARDWARE==========================================================END INITIALIZING HARDWARE
-        
+
 //INITIALIZE POSITIONS===============================================================INITIALIZE POSITIONS
         //servos
         armServoLeft.setPosition(armServoLeftDown);
