@@ -29,6 +29,7 @@ public class arcadeDrive extends LinearOpMode {
     private double armServoRightDown = armServoLeftUp;
     //motors
     private double intakeSpeed = 1;
+    private int liftPosition = 0;
 //END VARIABLES================================================================END VARIABLES
 
     @Override
@@ -93,7 +94,18 @@ public class arcadeDrive extends LinearOpMode {
     }
     private void lift()
     {
-        liftMotor.setPower(gamepad2.left_stick_y);
+        if(gamepad2.left_stick_y != 0)
+        {
+            liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            liftPosition = liftMotor.getCurrentPosition();
+            liftMotor.setPower(gamepad2.left_stick_y);
+        }
+        else
+        {
+            liftMotor.setTargetPosition(liftPosition);
+            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        }
+
         if(gamepad2.a)
         {
             armServoLeft.setPosition(armServoLeftDown);

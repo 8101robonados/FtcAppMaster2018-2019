@@ -8,7 +8,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import com.qualcomm.robotcore.util.Range;
 
-@Autonomous(name = "autonomous", group = "auto")
-public class autonomous extends LinearOpMode {
+//@Autonomous(name = "autonomous", group = "auto")
+//public class autonomous extends LinearOpMode {
 
-}
+//}
