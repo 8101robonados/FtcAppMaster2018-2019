@@ -18,6 +18,7 @@ public class arcadeDrive extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor liftMotor;
     private DcMotor intakeMotor;
+    private DcMotor hangArmMotor;
     private Servo armServoLeft;
     private Servo armServoRight;
 
@@ -43,6 +44,7 @@ public class arcadeDrive extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
+        hangArmMotor = hardwareMap.get(DcMotor.class, "hangArmMotor");
         //servos
         armServoLeft = hardwareMap.get(Servo.class, "armServoLeft");
         armServoRight = hardwareMap.get(Servo.class, "armServoRight");
@@ -66,10 +68,12 @@ public class arcadeDrive extends LinearOpMode {
         {
             drive();
             lift();
+            hangArm();
             intake();
             telemetry.addData("Status", "Run Time: " + runtime.toString());
             telemetry.addData("Arm Servo Left", "Position: " + armServoLeft.getPosition());
             telemetry.addData("Arm Servo Right", "Position: " + armServoRight.getPosition());
+            telemetry.addData("hangArmMotor", "Position: " + hangArmMotor.getCurrentPosition());
             telemetry.update();
         }
     }
@@ -112,5 +116,9 @@ public class arcadeDrive extends LinearOpMode {
         {
             intakeMotor.setPower(0);
         }
+    }
+    private void hangArm()
+    {
+        hangArmMotor.setPower(gamepad2.right_stick_x);
     }
 }
