@@ -70,10 +70,8 @@ public class arcadeDrive extends LinearOpMode {
             lift();
             hangArm();
             intake();
-            telemetry.addData("Status", "Run Time: " + runtime.toString());
-            telemetry.addData("Arm Servo Left", "Position: " + armServoLeft.getPosition());
-            telemetry.addData("Arm Servo Right", "Position: " + armServoRight.getPosition());
             telemetry.addData("hangArmMotor", "Position: " + hangArmMotor.getCurrentPosition());
+            telemetry.addData("liftMotor", "Position: " + liftMotor.getCurrentPosition());
             telemetry.update();
         }
     }
