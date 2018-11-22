@@ -17,7 +17,7 @@ public class arcadeDrive extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor liftMotor;
     private DcMotor intakeMotor;
-    private DcMotor hangArmMotor;
+    private DcMotor hangLockMotor;
     private Servo armServoLeft;
     private Servo armServoRight;
 
@@ -28,8 +28,36 @@ public class arcadeDrive extends LinearOpMode {
     private double armServoRightUp = armServoLeftDown;
     private double armServoRightDown = armServoLeftUp;
     //motors
-    private double intakeSpeed = 1;
+    private double intakeSpeed = .8;
+    private double outtakeSpeed = -.8;
     private int liftPosition = 0;
+    private enum intake
+    {
+        out {
+            @Override
+            public intake back()
+            {
+                return this;
+            }
+        },
+        stop,
+        in {
+            @Override
+            public intake next()
+            {
+                return this;
+            }
+        };
+        public intake next()
+        {
+            return values()[ordinal() + 1];
+        }
+        public intake back()
+        {
+            return values()[ordinal() - 1];
+        }
+    }
+    intake intakeState = intake.stop;
 //END VARIABLES================================================================END VARIABLES
 
     @Override
@@ -44,7 +72,7 @@ public class arcadeDrive extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
-        hangArmMotor = hardwareMap.get(DcMotor.class, "hangArmMotor");
+        hangLockMotor = hardwareMap.get(DcMotor.class, "hangLcokMotor");
         //servos
         armServoLeft = hardwareMap.get(Servo.class, "armServoLeft");
         armServoRight = hardwareMap.get(Servo.class, "armServoRight");
@@ -68,9 +96,9 @@ public class arcadeDrive extends LinearOpMode {
         {
             drive();
             lift();
-            hangArm();
+            hangLock();
             intake();
-            telemetry.addData("hangArmMotor", "Position: " + hangArmMotor.getCurrentPosition());
+            telemetry.addData("hangLockMotor", "Position: " + hangLockMotor.getCurrentPosition());
             telemetry.addData("liftMotor", "Position: " + liftMotor.getCurrentPosition());
             telemetry.update();
         }
@@ -119,15 +147,27 @@ public class arcadeDrive extends LinearOpMode {
     {
         if(gamepad1.right_bumper)
         {
-            intakeMotor.setPower(intakeSpeed);
+            intakeState = intake.next();
         }
         else if(gamepad1.left_bumper)
         {
+            intakeState = intake.back();
+        }
+        if(intakeState == intake.out)
+        {
+            intakeMotor.setPower(outtakeSpeed);
+        }
+        else if(intakeState == intake.stop)
+        {
             intakeMotor.setPower(0);
         }
+        else if(intakeState == intake.in)
+        {
+            intakeMotor.setPower(intakeSpeed);
+        }
     }
-    private void hangArm()
+    private void hangLock()
     {
-        hangArmMotor.setPower(gamepad2.right_stick_x);
+        hangLockMotor.setPower(gamepad2.right_stick_x);
     }
 }

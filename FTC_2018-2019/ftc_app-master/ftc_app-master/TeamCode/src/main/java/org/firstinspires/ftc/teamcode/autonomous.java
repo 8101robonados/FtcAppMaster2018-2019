@@ -17,7 +17,7 @@ public class autonomous extends LinearOpMode {
     private DcMotor rightDrive;
     private DcMotor liftMotor;
     private DcMotor intakeMotor;
-    private DcMotor hangArmMotor;
+    private DcMotor hangLockMotor;
     private Servo armServoLeft;
     private Servo armServoRight;
 
@@ -34,7 +34,7 @@ public class autonomous extends LinearOpMode {
     private int rightDriveTarget = 0;
     private int liftMotorTarget = 0;
     private int intakeMotorTarget = 0;
-    private int hangArmMotorTarget = 0;
+    private int hangLockMotorTarget = 0;
 //END VARIABLES================================================================END VARIABLES
 
     @Override
@@ -49,7 +49,7 @@ public class autonomous extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
-        hangArmMotor = hardwareMap.get(DcMotor.class, "hangArmMotor");
+        hangLockMotor = hardwareMap.get(DcMotor.class, "hangLcokMotor");
         //servos
         armServoLeft = hardwareMap.get(Servo.class, "armServoLeft");
         armServoRight = hardwareMap.get(Servo.class, "armServoRight");
@@ -75,8 +75,8 @@ public class autonomous extends LinearOpMode {
         liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        hangArmMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        hangArmMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        hangLockMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        hangLockMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //END RESETTING ENCODERS==============================================================END RESETTING ENCODERS
 
         waitForStart();
@@ -84,7 +84,7 @@ public class autonomous extends LinearOpMode {
         if (opModeIsActive())
         {
             moveLiftMotor(280, 2);
-            moveHangArmMotor(50,1);
+            moveHangLockMotor(50,1);
             drive(280, 280, 2);
         }
     }
@@ -116,15 +116,15 @@ public class autonomous extends LinearOpMode {
             telemetry.update();
         }
     }
-    private void moveHangArmMotor(int addedDistance, double time)
+    private void moveHangLockMotor(int addedDistance, double time)
     {
         runtime.reset();
-        hangArmMotorTarget += addedDistance;
-        hangArmMotor.setTargetPosition(hangArmMotorTarget);
-        while(runtime.seconds()<time && !hangArmMotor.isBusy())
+        hangLockMotorTarget += addedDistance;
+        hangLockMotor.setTargetPosition(hangLockMotorTarget);
+        while(runtime.seconds()<time && !hangLockMotor.isBusy())
         {
-            telemetry.addData("Hang Arm Motor Target: ", hangArmMotorTarget);
-            telemetry.addData("Hang ARm Motor Position: ", hangArmMotor.getCurrentPosition());
+            telemetry.addData("Hang Arm Motor Target: ", hangLockMotorTarget);
+            telemetry.addData("Hang ARm Motor Position: ", hangLockMotor.getCurrentPosition());
             telemetry.update();
         }
     }
