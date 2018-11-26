@@ -7,7 +7,7 @@ import com.qualcomm.robotcore.hardware.Servo;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import java.util.ArrayList;
 import java.util.Collection;
-
+//hang arm +2000 to open -1000 for lift
 @Autonomous(name = "autonomous", group = "auto")
 public class autonomous extends LinearOpMode {
 
@@ -35,6 +35,7 @@ public class autonomous extends LinearOpMode {
     private int liftMotorTarget = 0;
     private int intakeMotorTarget = 0;
     private int hangLockMotorTarget = 0;
+
 //END VARIABLES================================================================END VARIABLES
 
     @Override
@@ -49,7 +50,7 @@ public class autonomous extends LinearOpMode {
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
         liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
-        hangLockMotor = hardwareMap.get(DcMotor.class, "hangLcokMotor");
+        hangLockMotor = hardwareMap.get(DcMotor.class, "hangLockMotor");
         //servos
         armServoLeft = hardwareMap.get(Servo.class, "armServoLeft");
         armServoRight = hardwareMap.get(Servo.class, "armServoRight");
@@ -124,7 +125,20 @@ public class autonomous extends LinearOpMode {
         while(runtime.seconds()<time && !hangLockMotor.isBusy())
         {
             telemetry.addData("Hang Arm Motor Target: ", hangLockMotorTarget);
-            telemetry.addData("Hang ARm Motor Position: ", hangLockMotor.getCurrentPosition());
+            telemetry.addData("Hang Arm Motor Position: ", hangLockMotor.getCurrentPosition());
+            telemetry.update();
+        }
+    }
+    private void moveMotors(ArrayList<DcMotor> motorArray, ArrayList<Integer> motorMovementArray, int time)
+    {
+        runtime.reset();
+        for(int i = 0; i<=motorArray.size(); i++)
+        {
+            motorArray.get(i).setTargetPosition(motorMovementArray.get(i)+motorArray.get(i).getCurrentPosition());
+        }
+        while(runtime.seconds()<time)
+        {
+            telemetry.addData("RunningMotors", null);
             telemetry.update();
         }
     }
