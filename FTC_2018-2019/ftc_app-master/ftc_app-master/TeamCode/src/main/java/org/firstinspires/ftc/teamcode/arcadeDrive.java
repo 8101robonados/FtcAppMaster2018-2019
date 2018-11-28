@@ -15,7 +15,8 @@ public class arcadeDrive extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive;
     private DcMotor rightDrive;
-    private DcMotor liftMotor;
+    private DcMotor leftLiftMotor;
+    private DcMotor rightLiftMotor;
     private DcMotor intakeMotor;
     private DcMotor hangLockMotor;
     private Servo armServoLeft;
@@ -31,6 +32,8 @@ public class arcadeDrive extends LinearOpMode {
     private double intakeSpeed = .8;
     private double outtakeSpeed = -.8;
     private int liftPosition = 0;
+    private boolean rightBumper = false;
+    private boolean leftBumper = false;
     private enum intake
     {
         out {
@@ -70,7 +73,8 @@ public class arcadeDrive extends LinearOpMode {
         //motors
         leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
-        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        leftLiftMotor = hardwareMap.get(DcMotor.class, "leftLiftMotor");
+        rightLiftMotor = hardwareMap.get(DcMotor.class, "rightLiftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         hangLockMotor = hardwareMap.get(DcMotor.class, "hangLockMotor");
         //servos
@@ -79,8 +83,12 @@ public class arcadeDrive extends LinearOpMode {
         //Set Motor Direction
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        liftMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightLiftMotor.setDirection(DcMotor.Direction.REVERSE);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
+        //Reset Position
+        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        rightLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
 //END INITIALIZING HARDWARE==========================================================END INITIALIZING HARDWARE
 
 //INITIALIZE POSITIONS===============================================================INITIALIZE POSITIONS
@@ -99,7 +107,8 @@ public class arcadeDrive extends LinearOpMode {
             hangLock();
             intake();
             telemetry.addData("hangLockMotor", "Position: " + hangLockMotor.getCurrentPosition());
-            telemetry.addData("liftMotor", "Position: " + liftMotor.getCurrentPosition());
+            telemetry.addData("leftLiftMotor", "Position: " + leftLiftMotor.getCurrentPosition());
+            telemetry.addData("rightLiftMotor", "Position: " + rightLiftMotor.getCurrentPosition());
             telemetry.addData("Intake Status", intakeState);
             telemetry.update();
         }
@@ -123,16 +132,19 @@ public class arcadeDrive extends LinearOpMode {
     {
         if(gamepad2.left_stick_y != 0)
         {
-            liftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
-            liftPosition = liftMotor.getCurrentPosition();
-            liftMotor.setPower(gamepad2.left_stick_y);
+            leftLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            rightLiftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+            liftPosition = leftLiftMotor.getCurrentPosition();
+            leftLiftMotor.setPower(gamepad2.left_stick_y);
+            rightLiftMotor.setPower(gamepad2.left_stick_y);
         }
         else
         {
-            liftMotor.setTargetPosition(liftPosition);
-            liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            leftLiftMotor.setTargetPosition(liftPosition);
+            rightLiftMotor.setTargetPosition(liftPosition);
+            leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+            rightLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         }
-
         if(gamepad2.a)
         {
             armServoLeft.setPosition(armServoLeftDown);
@@ -149,11 +161,33 @@ public class arcadeDrive extends LinearOpMode {
         //set state
         if(gamepad1.right_bumper)
         {
-            intakeState.next();
+            if(!rightBumper)
+            {
+                intakeState.next();
+            }
+            else
+            {
+                rightBumper = true;
+            }
         }
-        else if(gamepad1.left_bumper)
+        else
         {
-            intakeState.back();
+            rightBumper = false;
+        }
+        if(gamepad1.left_bumper)
+        {
+            if(!leftBumper)
+            {
+                intakeState.back();
+            }
+            else
+            {
+                leftBumper = false;
+            }
+        }
+        else
+        {
+            leftBumper = false;
         }
 
         //set power

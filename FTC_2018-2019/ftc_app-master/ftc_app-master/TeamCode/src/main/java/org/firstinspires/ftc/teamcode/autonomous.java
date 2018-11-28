@@ -15,7 +15,8 @@ public class autonomous extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftDrive;
     private DcMotor rightDrive;
-    private DcMotor liftMotor;
+    private DcMotor leftLiftMotor;
+    private DcMotor rightLiftMotor;
     private DcMotor intakeMotor;
     private DcMotor hangLockMotor;
     private Servo armServoLeft;
@@ -32,9 +33,12 @@ public class autonomous extends LinearOpMode {
     private int liftPosition = 0;
     private int leftDriveTarget = 0;
     private int rightDriveTarget = 0;
-    private int liftMotorTarget = 0;
+    private int leftLiftMotorTarget = 0;
+    private int rightLiftMotorTarget = 0;
     private int intakeMotorTarget = 0;
     private int hangLockMotorTarget = 0;
+    int[] motorTargets = {leftDriveTarget, rightDriveTarget, leftLiftMotorTarget, rightLiftMotorTarget, intakeMotorTarget, hangLockMotorTarget};
+    DcMotor[] motors = {leftDrive, rightDrive, leftLiftMotor, rightLiftMotor, intakeMotor, hangLockMotor};
 
 //END VARIABLES================================================================END VARIABLES
 
@@ -48,7 +52,8 @@ public class autonomous extends LinearOpMode {
         //motors
         leftDrive  = hardwareMap.get(DcMotor.class, "leftDrive");
         rightDrive = hardwareMap.get(DcMotor.class, "rightDrive");
-        liftMotor = hardwareMap.get(DcMotor.class, "liftMotor");
+        leftLiftMotor = hardwareMap.get(DcMotor.class, "leftLiftMotor");
+        rightLiftMotor = hardwareMap.get(DcMotor.class, "rightLiftMotor");
         intakeMotor = hardwareMap.get(DcMotor.class, "intakeMotor");
         hangLockMotor = hardwareMap.get(DcMotor.class, "hangLockMotor");
         //servos
@@ -57,7 +62,8 @@ public class autonomous extends LinearOpMode {
         //Set Motor Direction
         leftDrive.setDirection(DcMotor.Direction.FORWARD);
         rightDrive.setDirection(DcMotor.Direction.REVERSE);
-        liftMotor.setDirection(DcMotor.Direction.FORWARD);
+        leftLiftMotor.setDirection(DcMotor.Direction.FORWARD);
+        rightLiftMotor.setDirection(DcMotor.Direction.REVERSE);
         intakeMotor.setDirection(DcMotor.Direction.FORWARD);
 //END INITIALIZING HARDWARE==========================================================END INITIALIZING HARDWARE
 
@@ -72,73 +78,54 @@ public class autonomous extends LinearOpMode {
         leftDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         rightDrive.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         rightDrive.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        liftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        liftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+        leftLiftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        leftLiftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         intakeMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         intakeMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
         hangLockMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         hangLockMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //END RESETTING ENCODERS==============================================================END RESETTING ENCODERS
-
         waitForStart();
         runtime.reset();
         if (opModeIsActive())
         {
-            moveLiftMotor(280, 2);
-            moveHangLockMotor(50,1);
-            drive(280, 280, 2);
+            moveMotors(0, 0, -1000, -1000, 0, 0, 3);
+            moveMotors(0, 0, 0, 0, 0, 2000, 3);
+            moveMotors(2000, 2000, 1000, 1000, 0, -2000, 3);
         }
     }
-    private void drive(int rightDriveAddedDistance, int leftDriveAddedDistance, double time)
+    private void moveMotors(int leftDriveMovement, int rightDriveMovement, int leftLiftMovement, int rightLiftMovement, int intakeMotorMovement, int hangLockMotorMovement, int time)
     {
         runtime.reset();
-        rightDriveTarget += rightDriveAddedDistance;
-        leftDriveTarget +=leftDriveAddedDistance;
-        rightDrive.setTargetPosition(rightDriveTarget);
-        leftDrive.setTargetPosition(leftDriveTarget);
-        while(runtime.seconds()<time && !rightDrive.isBusy() && !leftDrive.isBusy())
+        int [] motorMovementArray = {leftDriveMovement, rightDriveMovement, leftLiftMovement, rightLiftMovement, intakeMotorMovement, hangLockMotorMovement, 0};
+        for(int i = 0; i<=motors.length; i++)
         {
-            telemetry.addData("Left Drive Target: ", leftDriveTarget);
-            telemetry.addData("Left Drive Position: ", leftDrive.getCurrentPosition());
-            telemetry.addData("Right Drive Target: ", rightDriveTarget);
-            telemetry.addData("Right Drive Position: ", rightDrive.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    private void moveLiftMotor(int addedDistance, double time)
-    {
-        runtime.reset();
-        liftMotorTarget += addedDistance;
-        liftMotor.setTargetPosition(liftMotorTarget);
-        while(runtime.seconds()<time && !liftMotor.isBusy())
-        {
-            telemetry.addData("Lift Motor Target: ", liftMotorTarget);
-            telemetry.addData("Lift Motor Position: ", liftMotor.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    private void moveHangLockMotor(int addedDistance, double time)
-    {
-        runtime.reset();
-        hangLockMotorTarget += addedDistance;
-        hangLockMotor.setTargetPosition(hangLockMotorTarget);
-        while(runtime.seconds()<time && !hangLockMotor.isBusy())
-        {
-            telemetry.addData("Hang Arm Motor Target: ", hangLockMotorTarget);
-            telemetry.addData("Hang Arm Motor Position: ", hangLockMotor.getCurrentPosition());
-            telemetry.update();
-        }
-    }
-    private void moveMotors(ArrayList<DcMotor> motorArray, ArrayList<Integer> motorMovementArray, int time)
-    {
-        runtime.reset();
-        for(int i = 0; i<=motorArray.size(); i++)
-        {
-            motorArray.get(i).setTargetPosition(motorMovementArray.get(i)+motorArray.get(i).getCurrentPosition());
+            motors[i].setTargetPosition(motorMovementArray[i]+motorTargets[i]);
+            motorTargets[i] += motorMovementArray[i];
         }
         while(runtime.seconds()<time)
         {
-            telemetry.addData("RunningMotors", null);
+            telemetry.addData("LeftDrivePosition: ", leftDrive.getCurrentPosition());
+            telemetry.addData("LeftDriveTarget: ", leftDrive.getTargetPosition());
+
+            telemetry.addData("RightDrivePosition: ", rightDrive.getCurrentPosition());
+            telemetry.addData("RightDriveTarget: ", rightDrive.getTargetPosition());
+
+            telemetry.addData("LeftLiftPosition: ", leftLiftMotor.getCurrentPosition());
+            telemetry.addData("LeftLiftTarget: ", leftLiftMotor.getTargetPosition());
+
+            telemetry.addData("RightLiftPosition: ", rightLiftMotor.getCurrentPosition());
+            telemetry.addData("RightLiftTarget: ", rightLiftMotor.getTargetPosition());
+
+            telemetry.addData("IntakeMotorPosition: ", intakeMotor.getCurrentPosition());
+            telemetry.addData("IntakeMotorTarget: ", intakeMotor.getTargetPosition());
+
+            telemetry.addData("HangLockPosition: ", hangLockMotor.getCurrentPosition());
+            telemetry.addData("HangLockTarget: ", hangLockMotor.getTargetPosition());
+
+            telemetry.addData("TimeToMove: ", time);
+            telemetry.addData("Time: ", getRuntime());
+
             telemetry.update();
         }
     }
